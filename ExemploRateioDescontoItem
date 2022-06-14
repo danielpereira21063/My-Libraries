@@ -1,0 +1,19 @@
+public class Teste {
+public void AplicarDescontoItem(LocacaoItensViewModel itemViewModel, LocacaoViewModel locacaoViewModel)
+        {
+            var descontoASerAplicadoNaLocacao = locacaoViewModel.ValorDescontoAplicar;
+
+            var itemEntity = _locacaoItenRepository.GetById(itemViewModel.id);
+
+            var itensNaoPagos = locacaoViewModel?.locacaoItens.FindAll(x => x.valorPago < x.totalDiarias);
+            var valorRestanteLocacao = itensNaoPagos.Sum(x => x.totalDiarias - x.valorPago);
+            var valorLocacaoAposDesconto = valorRestanteLocacao - descontoASerAplicadoNaLocacao;
+            var valorRestanteItem = itemViewModel.totalDiarias - itemViewModel.valorPago;
+
+            var valorDescontoNesteItem_rateio = valorRestanteItem - (valorRestanteItem * valorLocacaoAposDesconto / valorRestanteLocacao);
+            itemEntity.ValorDesconto = valorDescontoNesteItem_rateio;
+
+            _locacaoItenRepository.Update(itemEntity);
+        }
+
+}
